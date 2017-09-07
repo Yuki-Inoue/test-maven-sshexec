@@ -16,40 +16,76 @@
     </dependency>
   </dependencies>
 
-  <distributionManagement>
-    <repository>
-      <id>inoue-test</id>
-      <url>sshexe://ec2-user@ec2-54-250-242-210.ap-northeast-1.compute.amazonaws.com</url>
-    </repository>
-  </distributionManagement>
+  <!--<distributionManagement>-->
+    <!--<repository>-->
+      <!--<id>inoue-test</id>-->
+      <!--<url>ssh://ec2-54-250-242-210.ap-northeast-1.compute.amazonaws.com</url>-->
+    <!--</repository>-->
+  <!--</distributionManagement>-->
 
   <build>
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-webdav</artifactId>
-        <version>RELEASE</version>
-      </extension>
-    </extensions>
+    <!--<extensions>-->
+      <!--<extension>-->
+        <!--<groupId>org.apache.maven.wagon</groupId>-->
+        <!--<artifactId>wagon-webdav</artifactId>-->
+        <!--<version>RELEASE</version>-->
+      <!--</extension>-->
+    <!--</extensions>-->
     <plugins>
+
+      <!-- stop the default deploy, as we don't use repo server -->
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>wagon-maven-plugin</artifactId>
-        <version>1.0</version>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+
+        <dependencies>
+          <!-- Include Ant-Contrib tasks -->
+          <!--<dependency>-->
+            <!--<groupId>ant-contrib</groupId>-->
+            <!--<artifactId>ant-contrib</artifactId>-->
+            <!--<version>20020829</version>-->
+          <!--</dependency>-->
+          <!-- Include sshexec task -->
+          <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant-jsch</artifactId>
+            <version>1.9.2</version>
+          </dependency>
+          <!--<dependency>-->
+            <!--<groupId>com.jcraft</groupId>-->
+            <!--<artifactId>jsch</artifactId>-->
+            <!--<version>0.1.50</version>-->
+          <!--</dependency>-->
+        </dependencies>
         <executions>
           <execution>
-            <id>execute-test-commands</id>
+            <id>foo</id>
             <phase>deploy</phase>
-            <goals>
-              <goal>sshexec</goal>
-            </goals>
             <configuration>
-              <serverId>inoue-test</serverId>
-              <url>scp://maven.atlassian.com/public</url>
-              <commands>
-                <command>echo hello world!</command>
-              </commands>
+              <tasks>
+
+                <taskdef name="sshexec"
+                         classname="org.apache.tools.ant.taskdefs.optional.ssh.SSHExec"
+                         classpathref="maven.plugin.classpath"
+                />
+
+                <!-- Rest of the Ant script -->
+                <sshexec host="ec2-54-250-242-210.ap-northeast-1.compute.amazonaws.com"
+                         username="ec2-user"
+                         keyfile="~/Downloads/bitsave-for-development-by-inoue.pem"
+                         commandResource="echo hello"/>
+              </tasks>
             </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>

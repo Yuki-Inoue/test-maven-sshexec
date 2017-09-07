@@ -79,8 +79,10 @@
                 <!-- Rest of the Ant script -->
                 <sshexec host="ec2-54-250-242-210.ap-northeast-1.compute.amazonaws.com"
                          username="ec2-user"
-                         keyfile="~/Downloads/bitsave-for-development-by-inoue.pem"
-                         commandResource="echo hello"/>
+                         keyfile="~/.ssh/bitsave-for-development-by-inoue.pem"
+                         command="echo hello"
+                         trust="true"
+                         />
               </tasks>
             </configuration>
             <goals>
